@@ -14,8 +14,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var inputTodo: EditText
     private lateinit var addButton: Button
-    private lateinit var todoList: ArrayList<String>
     private lateinit var todoListTV: TextView
+    private lateinit var viewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,18 +26,21 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        viewModel = TaskViewModel()
+
+        viewModel.tasks.observe(this) {
+            tasks -> updateTodoList(tasks)
+        }
 
         inputTodo = findViewById(R.id.inputTodoET)
         addButton = findViewById(R.id.addTaskBtn)
         todoListTV = findViewById(R.id.todoListTV)
-        todoList = ArrayList()
 
         addButton.setOnClickListener {
             val task = inputTodo.text.toString().trim()
             if (task.isNotEmpty()) {
-                todoList.add(task)
+                viewModel.addTask(task)
                 inputTodo.text.clear()
-                updateTodoList()
             }
             else
             {
@@ -48,10 +51,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun updateTodoList() {
+    fun updateTodoList(tasks: List<Task>) {
         todoListTV.text = ""
-        for (i in todoList.indices) {
-            todoListTV.append("${todoList[i]}\n")
+        for (i in tasks.indices) {
+            todoListTV.append("${tasks[i].text}\n")
         }
 
     }
